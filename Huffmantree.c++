@@ -96,20 +96,30 @@ void printtree(tree *root)
 
 int main()
 {
-    string text;
-    cout << "Enter string : ";
-    getline(cin, text);
-    tree *root = buildtree(text);
-    printtree(root);
+    // string text;
+    // cout << "Enter string : ";
+    // getline(cin, text);
+    // tree *root = buildtree(text);
+    // printtree(root);
+    // vector<bool> p;
+    // p.push_back(1);
+    // p.push_back(0);
+    // cout << sizeof(p[1]);
+    bool tb [2]={1,0};
+    chbit t('a',2,tb);
+    cout << "\n"
+         << sizeof(t);
+
     return 0;
 }
 
 class chbit
 {
+public:
     bool *bitcode;
     int size;
     char ch;
-
+    chbit() {}
     chbit(char ch, int size, bool *bitcode)
     {
         this->ch = ch;
