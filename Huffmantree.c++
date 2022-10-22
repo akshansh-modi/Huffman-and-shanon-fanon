@@ -2,7 +2,7 @@
 using namespace std;
 #include <unordered_map>
 #include <queue>
-
+class chbit;
 unordered_map<char, int> counter;
 
 void freqcount(string text)
@@ -72,7 +72,10 @@ tree *buildtree(string text)
 }
 void printtree(tree *root)
 {
-if(root==NULL){return;}
+    if (root == NULL)
+    {
+        return;
+    }
     if (root->ch != NULL)
     {
         cout << root->ch << ":" << root->freq;
@@ -81,12 +84,14 @@ if(root==NULL){return;}
     {
         cout << ":" << root->freq;
     }
-cout<<"L :";
+    cout << "\n";
+    cout << " L:";
     printtree(root->left);
-cout<<"R: ";
+    cout << " R:";
     printtree(root->right);
+    cout << "\n";
 
-return;
+    return;
 }
 
 int main()
@@ -98,3 +103,17 @@ int main()
     printtree(root);
     return 0;
 }
+
+class chbit
+{
+    bool *bitcode;
+    int size;
+    char ch;
+
+    chbit(char ch, int size, bool *bitcode)
+    {
+        this->ch = ch;
+        this->size = size;
+        this->bitcode = bitcode;
+    }
+};
