@@ -2,12 +2,15 @@
 using namespace std;
 #include <unordered_map>
 #include <queue>
-class chbit;
 unordered_map<char, int> counter;
-
+class chbit
+{
+public:
+    bool *code;
+    int size;
+};
 void freqcount(string text)
 {
-
     for (int i = 0; i < text.length(); i++)
     {
         counter[text[i]]++;
@@ -35,7 +38,9 @@ public:
     }
 };
 // priority queue -->minimum
+
 // max or min heap??
+void assign(tree *root, int len, bool *value);
 class comparenode
 {
 public:
@@ -94,36 +99,67 @@ void printtree(tree *root)
     return;
 }
 
+unordered_map<char, chbit *> bitcode;
+
 int main()
 {
-    // string text;
-    // cout << "Enter string : ";
-    // getline(cin, text);
-    // tree *root = buildtree(text);
-    // printtree(root);
+    string text;
+    cout << "Enter string : ";
+    getline(cin, text);
+    tree *root = buildtree(text);
+    printtree(root);
     // vector<bool> p;
     // p.push_back(1);
     // p.push_back(0);
     // cout << sizeof(p[1]);
-    bool tb [2]={1,0};
-    chbit t('a',2,tb);
-    cout << "\n"
-         << sizeof(t);
+    // bool tb[2] = {1, 0};
+    // chbit t(2, tb);
+    // cout << "\n"
+    //      << sizeof(t);
+    assign(root, 0, NULL);
+    for (auto i : bitcode)
+    {
+
+        cout << i.first << ":";
+        for (int j = 0; j < i.second->size; j++)
+        {
+            cout << i.second->code[j];
+            /* code */
+        }
+        cout << "\n";
+    }
 
     return 0;
 }
 
-class chbit
+void assign(tree *root, int len, bool *value)
 {
-public:
-    bool *bitcode;
-    int size;
-    char ch;
-    chbit() {}
-    chbit(char ch, int size, bool *bitcode)
+    if (root == NULL)
     {
-        this->ch = ch;
-        this->size = size;
-        this->bitcode = bitcode;
+        return;
     }
-};
+
+    if (root->ch != NULL)
+    {
+
+        bitcode[root->ch]->size = len;
+        bitcode[root->ch]->code = value;
+        return;
+    }
+    bool *valueright = new bool(len + 1);
+    bool *valueleft = new bool(len + 1);
+    for (int i = 0; i < len; len++)
+    {
+        valueright[i] = value[i];
+        valueleft[i] = value[i];
+    }
+    valueright[len] = 1;
+    valueleft[len] = 0;
+
+    assign(root->left, len + 1, valueleft);
+    assign(root->right, len + 1, valueright);
+
+    delete[] value;
+
+    return;
+}
