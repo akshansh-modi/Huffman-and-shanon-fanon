@@ -141,14 +141,16 @@ void assign(tree *root, int len, bool *value)
 
     if (root->ch != NULL)
     {
-
-        bitcode[root->ch]->size = len;
-        bitcode[root->ch]->code = value;
+bitcode[root->ch];
+chbit * temp= new chbit;
+temp->size= len;
+temp->code=value;
+        bitcode[root->ch]=temp;
         return;
     }
     bool *valueright = new bool(len + 1);
     bool *valueleft = new bool(len + 1);
-    for (int i = 0; i < len; len++)
+    for (int i = 0; i < len; i++)
     {
         valueright[i] = value[i];
         valueleft[i] = value[i];
