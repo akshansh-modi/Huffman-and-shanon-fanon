@@ -47,7 +47,7 @@ public:
     bool operator()(tree *l, tree *r)
 
     {
-        return (l->freq > r->freq);
+        return (l->freq >= r->freq);
     }
 };
 
@@ -57,7 +57,6 @@ tree *buildtree(string text)
     freqcount(text);
     for (auto i : counter)
     {
-
         tree *t = new tree(i.first, i.second);
         minheap.push(t);
     }
@@ -69,7 +68,7 @@ tree *buildtree(string text)
         tree *smallright = minheap.top();
         minheap.pop();
         int parentfreq = smallleft->freq + smallright->freq;
-        tree *parent = new tree(NULL, parentfreq, smallleft, smallright);
+        tree *parent = new tree('\0', parentfreq, smallleft, smallright);
         minheap.push(parent);
     }
 
@@ -81,7 +80,7 @@ void printtree(tree *root)
     {
         return;
     }
-    if (root->ch != NULL)
+    if (root->ch != '\0')
     {
         cout << root->ch << ":" << root->freq;
     }
@@ -139,13 +138,13 @@ void assign(tree *root, int len, bool *value)
         return;
     }
 
-    if (root->ch != NULL)
+    if (root->ch != '\0')
     {
-bitcode[root->ch];
-chbit * temp= new chbit;
-temp->size= len;
-temp->code=value;
-        bitcode[root->ch]=temp;
+        bitcode[root->ch];
+        chbit *temp = new chbit;
+        temp->size = len;
+        temp->code = value;
+        bitcode[root->ch] = temp;
         return;
     }
     bool *valueright = new bool(len + 1);
