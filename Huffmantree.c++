@@ -1,15 +1,17 @@
 #include <iostream>
 using namespace std;
+#include <fstream>
+
 #include <unordered_map>
 #include <queue>
 unordered_map<char, int> counter;
-class chbit
+class chbit // will be used to assign bitcode to characters
 {
 public:
     bool *code;
     int size;
 };
-void freqcount(string text)
+void freqcount(string text) // assign frequency of occurance to
 {
     for (int i = 0; i < text.length(); i++)
     {
@@ -41,7 +43,7 @@ public:
 
 // max or min heap??
 void assign(tree *root, int len, bool *value);
-class comparenode
+class comparenode // for making of minimum priority queue
 {
 public:
     bool operator()(tree *l, tree *r)
@@ -52,9 +54,8 @@ public:
 };
 
 priority_queue<tree *, vector<tree *>, comparenode> minheap;
-tree *buildtree(string text)
+tree *buildtree() // to build tree
 {
-    freqcount(text);
     for (auto i : counter)
     {
         tree *t = new tree(i.first, i.second);
@@ -74,7 +75,7 @@ tree *buildtree(string text)
 
     return minheap.top();
 }
-void printtree(tree *root)
+void printtree(tree *root) // to check tree made
 {
     if (root == NULL)
     {
@@ -97,24 +98,21 @@ void printtree(tree *root)
 
     return;
 }
-
 unordered_map<char, chbit *> bitcode;
+
+void encode()
+{
+}
 
 int main()
 {
+    /*
     string text;
     cout << "Enter string : ";
     getline(cin, text);
     tree *root = buildtree(text);
     printtree(root);
-    // vector<bool> p;
-    // p.push_back(1);
-    // p.push_back(0);
-    // cout << sizeof(p[1]);
-    // bool tb[2] = {1, 0};
-    // chbit t(2, tb);
-    // cout << "\n"
-    //      << sizeof(t);
+
     assign(root, 0, NULL);
     for (auto i : bitcode)
     {
@@ -123,15 +121,70 @@ int main()
         for (int j = 0; j < i.second->size; j++)
         {
             cout << i.second->code[j];
-            /* code */
+
         }
         cout << "\n";
     }
+    */
+    //--------------------------------------------------------------------------------------------------------------
+    string line;
+    ofstream fout;
+    fout.open("encode.txt", ios::app);
+    ifstream fin;
+    fin.open("sample.txt");
+    while (getline(fin, line))
+    {
+        cout << line << endl;
+        freqcount(line);
+    }
+    tree *root = buildtree();
+    // printtree(root);
+
+    assign(root, 0, NULL);
+    /*  for (auto i : bitcode)
+       {
+
+           cout << i.first << ":";
+           for (int j = 0; j < i.second->size; j++)
+           {
+               cout << i.second->code[j];
+              // code
+           }
+           cout << "\n";
+       }
+       */
+    fin.close();
+
+    fin.open("sample.txt");
+    char cr;
+    int freq;
+
+    for (auto i : counter)
+    {
+        cr = i.first;
+        freq = i.second;
+        fout << cr << "\t" << freq << "\t";
+    }
+    fout << "\n"
+         << "==lol==";
+
+         
+    // fout.write((char *)&obj, sizeof(obj));
+
+    // while (getline(fin, line))
+    // {
+    //     cout << line << endl;
+    // }
+
+    fin.close();
+    fout.close();
+
+    //----------------------------------------------------------------------------------------------------------------
 
     return 0;
 }
 
-void assign(tree *root, int len, bool *value)
+void assign(tree *root, int len, bool *value) // to assign bitcode to all char in tree
 {
     if (root == NULL)
     {
