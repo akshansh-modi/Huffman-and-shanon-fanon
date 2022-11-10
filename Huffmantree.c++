@@ -251,10 +251,9 @@ int main()
     bool found = 0;
     char cr;
     int freq;
-  
-  
-fin>>cr>>freq;
-counter[cr]=freq;
+
+    fin >> cr >> freq;
+    counter[cr] = freq;
     fin.close();
     fout.close();
 
