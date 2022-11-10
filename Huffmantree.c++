@@ -102,10 +102,7 @@ unordered_map<char, chbit *> bitcode;
 
 void encode()
 {
-}
 
-int main()
-{
     /*
     string text;
     cout << "Enter string : ";
@@ -127,6 +124,7 @@ int main()
     }
     */
     //--------------------------------------------------------------------------------------------------------------
+    // encoding part
     string line;
     ofstream fout;
     fout.open("encode.txt", ios::app);
@@ -134,7 +132,7 @@ int main()
     fin.open("sample.txt");
     while (getline(fin, line))
     {
-        cout << line << endl;
+        // cout << line << endl;
         freqcount(line);
     }
     tree *root = buildtree();
@@ -167,15 +165,96 @@ int main()
     }
     fout << "\n"
          << "==lol==";
+    fout << "\n";
+    int bufcount = 0;
+    char buff = '\0';
+    while (getline(fin, line))
+    {
 
-         
+        for (int f = 0; f < line.length(); f++)
+        {
+
+            chbit *temp = bitcode[line[f]];
+            for (int i = 0; i < temp->size; i++)
+            {
+                if (temp->code[i])
+                {
+                    buff |= 1 << (7 - bufcount);
+                }
+                bufcount++;
+                if (bufcount == 8)
+                {
+                    fout << buff;
+                    bufcount = 0;
+                    buff = '\0';
+                }
+            }
+        }
+        /*char k = 'l';
+           for (int i = 0; i < 8; i++)
+           {
+               if ((k >> (7 - i)) & 1)
+               {
+                   buff |= 1 << (7 - i);// writing bit
+               }
+           }
+
+            for (int i = 0; i < 8; i++)
+           {
+               int tmp = (buff >> (7-i)) & 0x1;// getting bit
+               cout << tmp;
+           }
+
+
+       */
+    }
+
     // fout.write((char *)&obj, sizeof(obj));
 
-    // while (getline(fin, line))
-    // {
-    //     cout << line << endl;
-    // }
+    fin.close();
+    fout.close();
 
+    //----------------------------------------------------------------------------------------------------------------
+}
+
+int main()
+{
+    encode();
+
+    /*
+    string text;
+    cout << "Enter string : ";
+    getline(cin, text);
+    tree *root = buildtree(text);
+    printtree(root);
+
+    assign(root, 0, NULL);
+    for (auto i : bitcode)
+    {
+
+        cout << i.first << ":";
+        for (int j = 0; j < i.second->size; j++)
+        {
+            cout << i.second->code[j];
+
+        }
+        cout << "\n";
+    }
+    */
+    //--------------------------------------------------------------------------------------------------------------
+    // encoding part
+    string line;
+    ofstream fout;
+    ifstream fin;
+    fout.open("sample2.txt", ios::app);
+    fin.open("encode.txt");
+    bool found = 0;
+    char cr;
+    int freq;
+  
+  
+fin>>cr>>freq;
+counter[cr]=freq;
     fin.close();
     fout.close();
 
