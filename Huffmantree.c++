@@ -1,21 +1,26 @@
 #include <iostream>
 using namespace std;
 #include <fstream>
-
+#define HEADER_TEXT_SEPERATOR char(132)
+#define SPACE char(129)
 #include <unordered_map>
 #include <queue>
+
 unordered_map<char, int> counter;
-class chbit // will be used to assign bitcode to characters
-{
-public:
-    bool *code;
-    int size;
-};
+
 void freqcount(string text) // assign frequency of occurance to
 {
-    for (int i = 0; i < text.length(); i++)
+    int length = text.length();
+    for (int i = 0; i < length; i++)
     {
-        counter[text[i]]++;
+        if (text[i] == '\n')
+        {
+            counter['\n']++;
+        }
+        else
+        {
+            counter[text[i]]++;
+        }
     }
     return;
 }
@@ -34,15 +39,9 @@ public:
         this->left = left;
         this->right = right;
     }
-    bool compare(tree *other)
-    {
-        return this->freq < other->freq;
-    }
 };
-// priority queue -->minimum
 
-// max or min heap??
-void assign(tree *root, int len, bool *value);
+void assign(tree *root, string value);
 class comparenode // for making of minimum priority queue
 {
 public:
@@ -54,6 +53,7 @@ public:
 };
 
 priority_queue<tree *, vector<tree *>, comparenode> minheap;
+
 tree *buildtree() // to build tree
 {
     for (auto i : counter)
@@ -75,6 +75,7 @@ tree *buildtree() // to build tree
 
     return minheap.top();
 }
+/*
 void printtree(tree *root) // to check tree made
 {
     if (root == NULL)
@@ -97,34 +98,13 @@ void printtree(tree *root) // to check tree made
     cout << "\n";
 
     return;
-}
-unordered_map<char, chbit *> bitcode;
-
+}*/
+//
+unordered_map<char, string> bitcode;
+unordered_map<string, char> charac;
 void encode()
 {
 
-    /*
-    string text;
-    cout << "Enter string : ";
-    getline(cin, text);
-    tree *root = buildtree(text);
-    printtree(root);
-
-    assign(root, 0, NULL);
-    for (auto i : bitcode)
-    {
-
-        cout << i.first << ":";
-        for (int j = 0; j < i.second->size; j++)
-        {
-            cout << i.second->code[j];
-
-        }
-        cout << "\n";
-    }
-    */
-    //--------------------------------------------------------------------------------------------------------------
-    // encoding part
     string line;
     ofstream fout;
     fout.open("encode.txt", ios::app);
@@ -132,52 +112,47 @@ void encode()
     fin.open("sample.txt");
     while (getline(fin, line))
     {
-        // cout << line << endl;
         freqcount(line);
     }
     tree *root = buildtree();
-    // printtree(root);
 
-    assign(root, 0, NULL);
-    /*  for (auto i : bitcode)
-       {
-
-           cout << i.first << ":";
-           for (int j = 0; j < i.second->size; j++)
-           {
-               cout << i.second->code[j];
-              // code
-           }
-           cout << "\n";
-       }
-       */
+    assign(root, "");
     fin.close();
 
     fin.open("sample.txt");
     char cr;
-    int freq;
+    string code;
 
-    for (auto i : counter)
+    for (auto i : bitcode)
     {
         cr = i.first;
-        freq = i.second;
-        fout << cr << "\t" << freq << "\t";
+        code = i.second;
+        if (cr == ' ')
+        {
+            fout << SPACE << "\t" << code << "\t";
+        }
+
+        else
+        {
+            fout << cr << "\t" << code << "\t";
+        }
     }
     fout << "\n"
-         << "==lol==";
+         << HEADER_TEXT_SEPERATOR;
     fout << "\n";
     int bufcount = 0;
     char buff = '\0';
     while (getline(fin, line))
     {
-
-        for (int f = 0; f < line.length(); f++)
+        int lengthf = line.size();
+        for (int f = 0; f < lengthf; f++)
         {
 
-            chbit *temp = bitcode[line[f]];
-            for (int i = 0; i < temp->size; i++)
+            string temp = bitcode[line[f]];
+            int lengthi = temp.size();
+            for (int i = 0; i < lengthi; i++)
             {
-                if (temp->code[i])
+                if (temp[i] == '1')
                 {
                     buff |= 1 << (7 - bufcount);
                 }
@@ -190,59 +165,14 @@ void encode()
                 }
             }
         }
-        /*char k = 'l';
-           for (int i = 0; i < 8; i++)
-           {
-               if ((k >> (7 - i)) & 1)
-               {
-                   buff |= 1 << (7 - i);// writing bit
-               }
-           }
-
-            for (int i = 0; i < 8; i++)
-           {
-               int tmp = (buff >> (7-i)) & 0x1;// getting bit
-               cout << tmp;
-           }
-
-
-       */
     }
-
-    // fout.write((char *)&obj, sizeof(obj));
 
     fin.close();
     fout.close();
-
-    //----------------------------------------------------------------------------------------------------------------
 }
 
-int main()
+void decode()
 {
-    encode();
-
-    /*
-    string text;
-    cout << "Enter string : ";
-    getline(cin, text);
-    tree *root = buildtree(text);
-    printtree(root);
-
-    assign(root, 0, NULL);
-    for (auto i : bitcode)
-    {
-
-        cout << i.first << ":";
-        for (int j = 0; j < i.second->size; j++)
-        {
-            cout << i.second->code[j];
-
-        }
-        cout << "\n";
-    }
-    */
-    //--------------------------------------------------------------------------------------------------------------
-    // encoding part
     string line;
     ofstream fout;
     ifstream fin;
@@ -250,19 +180,69 @@ int main()
     fin.open("encode.txt");
     bool found = 0;
     char cr;
-    int freq;
+    string code;
+    fin >> cr;
+    while (cr != HEADER_TEXT_SEPERATOR)
+    {
+        fin >> code;
+        if (cr == SPACE)
+        {
+            bitcode[' '] = code;
+        }
 
-    fin >> cr >> freq;
-    counter[cr] = freq;
+        else
+        {
+            bitcode[cr] = code;
+        }
+        fin >> cr;
+    }
+
+    for (auto i : bitcode)
+    {
+        charac[i.second] = i.first;
+    }
+
+    string br = "";
+    string lined;
+    while (getline(fin, lined))
+    {
+        int lengthd = lined.length();
+        for (int f = 0; f < lengthd; f++)
+        {
+
+            for (int i = 0; i < 8; i++)
+            {
+                if ((lined[f] >> (7 - i)) & 1)
+                {
+                    br += "1";
+                }
+                else
+                {
+                    br += "0";
+                }
+                if (charac.count(br))
+                {
+
+                    fout << charac[br];
+                    br = "";
+                }
+            }
+        }
+    }
+
     fin.close();
     fout.close();
+}
 
-    //----------------------------------------------------------------------------------------------------------------
+int main()
+{
+    // encode();
+    decode();
 
     return 0;
 }
 
-void assign(tree *root, int len, bool *value) // to assign bitcode to all char in tree
+void assign(tree *root, string value) // to assign bitcode to all char in tree
 {
     if (root == NULL)
     {
@@ -272,26 +252,16 @@ void assign(tree *root, int len, bool *value) // to assign bitcode to all char i
     if (root->ch != '\0')
     {
         bitcode[root->ch];
-        chbit *temp = new chbit;
-        temp->size = len;
-        temp->code = value;
-        bitcode[root->ch] = temp;
+
+        bitcode[root->ch] = value;
         return;
     }
-    bool *valueright = new bool(len + 1);
-    bool *valueleft = new bool(len + 1);
-    for (int i = 0; i < len; i++)
-    {
-        valueright[i] = value[i];
-        valueleft[i] = value[i];
-    }
-    valueright[len] = 1;
-    valueleft[len] = 0;
 
-    assign(root->left, len + 1, valueleft);
-    assign(root->right, len + 1, valueright);
+    string valueright = value + "1";
+    string valueleft = value + "0";
 
-    delete[] value;
+    assign(root->left, valueleft);
+    assign(root->right, valueright);
 
     return;
 }
