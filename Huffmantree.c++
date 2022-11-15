@@ -5,7 +5,8 @@ using namespace std;
 #define SPACE char(129)
 #include <unordered_map>
 #include <queue>
-
+#include <unistd.h>
+#include <windows.h>
 unordered_map<char, int> counter;
 
 void freqcount(string text) // assign frequency of occurance to
@@ -102,14 +103,14 @@ void printtree(tree *root) // to check tree made
 //
 unordered_map<char, string> bitcode;
 unordered_map<string, char> charac;
-void encode()
+void encode(string filename, string encodefile)
 {
 
     string line;
     ofstream fout;
-    fout.open("encode.txt", ios::app);
+    fout.open(encodefile, ios::app);
     ifstream fin;
-    fin.open("sample.txt");
+    fin.open(filename);
     while (getline(fin, line))
     {
         freqcount(line);
@@ -119,7 +120,7 @@ void encode()
     assign(root, "");
     fin.close();
 
-    fin.open("sample.txt");
+    fin.open(filename);
     char cr;
     string code;
 
@@ -171,14 +172,13 @@ void encode()
     fout.close();
 }
 
-void decode()
+void decode(string encodefilename, string decodefilename)
 {
     string line;
     ofstream fout;
     ifstream fin;
-    fout.open("sample2.txt", ios::app);
-    fin.open("encode.txt");
-    bool found = 0;
+    fout.open(decodefilename, ios::app);
+    fin.open(encodefilename);
     char cr;
     string code;
     fin >> cr;
@@ -234,10 +234,53 @@ void decode()
     fout.close();
 }
 
+// void copy()
+// {
+//     ifstream fin;
+//     ofstream fout;
+//     string line;
+//     fin.open("encode.txt");
+//     fout.open("copyen.txt", ios::app);
+//     while (getline(fin, line))
+//     {
+//         fout << line;
+//     }
+// }
+
+void entry();
 int main()
 {
-    // encode();
-    decode();
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+    entry();
+    cout << "\n1. Encode\n2. Decode\n";
+    int x;
+    cin >> x;
+    string filename;
+    string encodefile;
+    string decodefile;
+    switch (x)
+    {
+    case 1:
+        cout << "enter filenaem: ";
+        cin >> filename;
+        cout << "enter encodefile: ";
+        cin >> encodefile;
+        encode(filename, encodefile);
+        break;
+    case 2:
+
+        cout << "enter encodefile: ";
+        cin >> encodefile;
+        cout << "enter decodefile: ";
+        cin >> decodefile;
+        decode(encodefile, decodefile);
+        break;
+    // case 3:
+    //     copy();
+    //     break;
+    default:
+        break;
+    }
 
     return 0;
 }
@@ -264,4 +307,76 @@ void assign(tree *root, string value) // to assign bitcode to all char in tree
     assign(root->right, valueright);
 
     return;
+}
+
+void entry()
+{
+
+    string entry = "---------------WELCOME----------------";
+
+    string project = "DS LAB PBL";
+
+    string made = " MADE BY";
+    string name1 = "Akshansh Modi";
+    string name2 = "Saumya Bansal";
+    string name3 = "Armaan Sharma";
+    string name4 = "Arshika Porwal";
+
+    string end = "--------------------------------------";
+
+    cout << "\t\t\t\t";
+    for (int i = 0; i < entry.length(); i++)
+    {
+        cout << entry[i];
+        usleep(100000);
+    }
+    // for (int i = 0; i < sizesmall; i++)
+    //    {
+
+    //        smallstr[i] = output[i];
+    //    }
+    cout << "\n\t\t\t\t\t     ";
+    for (int i = 0; i < project.length(); i++)
+    {
+        cout << project[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t      ";
+    for (int i = 0; i < made.length(); i++)
+    {
+        cout << made[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name1.length(); i++)
+    {
+        cout << name1[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name2.length(); i++)
+    {
+        cout << name2[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name3.length(); i++)
+    {
+        cout << name3[i];
+        usleep(100000);
+    }
+
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name4.length(); i++)
+    {
+        cout << name4[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t";
+
+    for (int i = 0; i < end.length(); i++)
+    {
+        cout << end[i];
+        usleep(100000);
+    }
 }
