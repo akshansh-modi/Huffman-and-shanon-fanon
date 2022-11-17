@@ -1,29 +1,21 @@
 #include <iostream>
 using namespace std;
 #include <fstream>
-#define HEADER_TEXT_SEPERATOR char(132)
-#define SPACE char(129)
+#define INTERNAL_NODE_CHARACTER char(188)
+#define PSEUDO_EOF char(129)
+#define CHARACTER_CODE_SEPERATOR char(189)
+#define HEADER_ENTRY_SEPERATOR char(190)
+#define HEADER_TEXT_SEPERATOR char(191)
 #include <unordered_map>
 #include <queue>
 #include <unistd.h>
 #include <windows.h>
 unordered_map<char, int> counter;
 
-void freqcount(string text) // assign frequency of occurance to
+void freqcount(char text) // assign frequency of occurance to characters
 {
-    int length = text.length();
-    for (int i = 0; i < length; i++)
-    {
-        if (text[i] == '\n')
-        {
-            counter['\n']++;
-        }
-        else
-        {
-            counter[text[i]]++;
-        }
-    }
-    return;
+
+    counter[text]++;
 }
 class tree
 {
@@ -106,20 +98,31 @@ unordered_map<string, char> charac;
 void encode(string filename, string encodefile)
 {
 
-    string line;
     ofstream fout;
     fout.open(encodefile, ios::app);
     ifstream fin;
     fin.open(filename);
-    while (getline(fin, line))
+    while (fin)
     {
-        freqcount(line);
+        char c = fin.get();
+
+        freqcount(c);
     }
     tree *root = buildtree();
 
-    assign(root, "");
+    assign(root, ""); // saare characters ko bitcode assign hon gayeeeee
     fin.close();
-
+    /*
+     for (auto i : counter)
+     {
+         cout << i.first << " : " << i.second << "\n";
+     }
+     cout << "\n\n";
+     for (auto i : bitcode)
+     {
+         cout << i.first << " : " << i.second << "\n";
+     }
+ */
     fin.open(filename);
     char cr;
     string code;
@@ -128,46 +131,35 @@ void encode(string filename, string encodefile)
     {
         cr = i.first;
         code = i.second;
-        if (cr == ' ')
-        {
-            fout << SPACE << "\t" << code << "\t";
-        }
 
-        else
-        {
-            fout << cr << "\t" << code << "\t";
-        }
+       fout <<cr << CHARACTER_CODE_SEPERATOR <<code<< HEADER_ENTRY_SEPERATOR;
     }
-    fout << "\n"
-         << HEADER_TEXT_SEPERATOR;
-    fout << "\n";
+    fout << HEADER_TEXT_SEPERATOR;
+
     int bufcount = 0;
     char buff = '\0';
-    while (getline(fin, line))
+    while (fin)
     {
-        int lengthf = line.size();
-        for (int f = 0; f < lengthf; f++)
-        {
+        char c = fin.get();
 
-            string temp = bitcode[line[f]];
-            int lengthi = temp.size();
-            for (int i = 0; i < lengthi; i++)
+        string temp = bitcode[c];
+        int lengthi = temp.size();
+        for (int i = 0; i < lengthi; i++)
+        {
+            if (temp[i] == '1')
             {
-                if (temp[i] == '1')
-                {
-                    buff |= 1 << (7 - bufcount);
-                }
-                bufcount++;
-                if (bufcount == 8)
-                {
-                    fout << buff;
-                    bufcount = 0;
-                    buff = '\0';
-                }
+                buff |= 1 << (7 - bufcount);
+            }
+            bufcount++;
+            if (bufcount == 8)
+            {
+                fout << buff;
+                bufcount = 0;
+                buff = '\0';
             }
         }
     }
-
+    fout <<PSEUDO_EOF;
     fin.close();
     fout.close();
 }
@@ -181,54 +173,50 @@ void decode(string encodefilename, string decodefilename)
     fin.open(encodefilename);
     char cr;
     string code;
-    fin >> cr;
+    cr = fin.get();
     while (cr != HEADER_TEXT_SEPERATOR)
     {
         fin >> code;
-        if (cr == SPACE)
-        {
-            bitcode[' '] = code;
-        }
 
-        else
-        {
-            bitcode[cr] = code;
-        }
-        fin >> cr;
+        bitcode[cr] = code;
+
+        cr = fin.get();
     }
-
+for(auto i : bitcode){
+ cout<< i .first << " : "<<i.second <<"\n";
+}
     for (auto i : bitcode)
     {
         charac[i.second] = i.first;
     }
 
-    string br = "";
-    string lined;
-    while (getline(fin, lined))
-    {
-        int lengthd = lined.length();
-        for (int f = 0; f < lengthd; f++)
-        {
+    // string br = "";
+    // string lined;
+    // while (getline(fin, lined))
+    // {
+    //     int lengthd = lined.length();
+    //     for (int f = 0; f < lengthd; f++)
+    //     {
 
-            for (int i = 0; i < 8; i++)
-            {
-                if ((lined[f] >> (7 - i)) & 1)
-                {
-                    br += "1";
-                }
-                else
-                {
-                    br += "0";
-                }
-                if (charac.count(br))
-                {
+    //         for (int i = 0; i < 8; i++)
+    //         {
+    //             if ((lined[f] >> (7 - i)) & 1)
+    //             {
+    //                 br += "1";
+    //             }
+    //             else
+    //             {
+    //                 br += "0";
+    //             }
+    //             if (charac.count(br))
+    //             {
 
-                    fout << charac[br];
-                    br = "";
-                }
-            }
-        }
-    }
+    //                 fout << charac[br];
+    //                 br = "";
+    //             }
+    //         }
+    //     }
+    // }
 
     fin.close();
     fout.close();
@@ -250,10 +238,10 @@ void decode(string encodefilename, string decodefilename)
 void entry();
 int main()
 {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
-    entry();
+    // SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+    // entry();
     cout << "\n1. Encode\n2. Decode\n";
-    int x;
+    int x ;
     cin >> x;
     string filename;
     string encodefile;
@@ -261,19 +249,20 @@ int main()
     switch (x)
     {
     case 1:
-        cout << "enter filenaem: ";
-        cin >> filename;
-        cout << "enter encodefile: ";
-        cin >> encodefile;
-        encode(filename, encodefile);
+        // cout << "enter filenaem: ";
+        // cin >> filename;
+        // cout << "enter encodefile: ";
+        // cin >> encodefile;
+        // encode(filename, encodefile);
+        encode("sample.txt", "encode.txt");
         break;
     case 2:
 
-        cout << "enter encodefile: ";
-        cin >> encodefile;
-        cout << "enter decodefile: ";
-        cin >> decodefile;
-        decode(encodefile, decodefile);
+        // cout << "enter encodefile: ";
+        // cin >> encodefile;
+        // cout << "enter decodefile: ";
+        // cin >> decodefile;
+        decode("encode.txt", "decode.txt");
         break;
     // case 3:
     //     copy();
