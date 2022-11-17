@@ -132,7 +132,7 @@ void encode(string filename, string encodefile)
         cr = i.first;
         code = i.second;
 
-       fout <<cr << CHARACTER_CODE_SEPERATOR <<code<< HEADER_ENTRY_SEPERATOR;
+        fout << cr << CHARACTER_CODE_SEPERATOR << code << HEADER_ENTRY_SEPERATOR;
     }
     fout << HEADER_TEXT_SEPERATOR;
 
@@ -159,7 +159,7 @@ void encode(string filename, string encodefile)
             }
         }
     }
-    fout <<PSEUDO_EOF;
+    fout << PSEUDO_EOF;
     fin.close();
     fout.close();
 }
@@ -172,51 +172,67 @@ void decode(string encodefilename, string decodefilename)
     fout.open(decodefilename, ios::app);
     fin.open(encodefilename);
     char cr;
+    char key;
     string code;
     cr = fin.get();
+    key = cr;
+
     while (cr != HEADER_TEXT_SEPERATOR)
     {
-        fin >> code;
 
-        bitcode[cr] = code;
+        if (cr == CHARACTER_CODE_SEPERATOR)
+        {
 
-        cr = fin.get();
+            fin.get(cr);
+            while (cr != HEADER_ENTRY_SEPERATOR)
+            {
+                bitcode[key] += cr;
+                fin.get(cr);
+            }
+        }
+
+        else
+        {
+            key = cr;
+            fin.get(cr);
+        }
     }
-for(auto i : bitcode){
- cout<< i .first << " : "<<i.second <<"\n";
-}
+    for (auto i : bitcode)
+    {
+        cout << i.first << " : " << i.second << "\n";
+    }
     for (auto i : bitcode)
     {
         charac[i.second] = i.first;
     }
 
-    // string br = "";
-    // string lined;
-    // while (getline(fin, lined))
-    // {
-    //     int lengthd = lined.length();
-    //     for (int f = 0; f < lengthd; f++)
-    //     {
+    string br = "";
+    char ct;
+   fin.get(ct);
+    while (ct!=PSEUDO_EOF)
+    {
+        
+       
 
-    //         for (int i = 0; i < 8; i++)
-    //         {
-    //             if ((lined[f] >> (7 - i)) & 1)
-    //             {
-    //                 br += "1";
-    //             }
-    //             else
-    //             {
-    //                 br += "0";
-    //             }
-    //             if (charac.count(br))
-    //             {
+            for (int i = 0; i < 8; i++)
+            {
+                if ((ct>> (7 - i)) & 1)
+                {
+                    br += "1";
+                }
+                else
+                {
+                    br += "0";
+                }
+                if (charac.count(br))
+                {
 
-    //                 fout << charac[br];
-    //                 br = "";
-    //             }
-    //         }
-    //     }
-    // }
+                    fout << charac[br];
+                    br = "";
+                }
+            }
+        fin.get(ct);
+    }
 
     fin.close();
     fout.close();
@@ -241,7 +257,7 @@ int main()
     // SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
     // entry();
     cout << "\n1. Encode\n2. Decode\n";
-    int x ;
+    int x;
     cin >> x;
     string filename;
     string encodefile;
