@@ -41,7 +41,7 @@ public:
     bool operator()(tree *l, tree *r)
 
     {
-        return (l->freq >= r->freq);
+        return (l->freq > r->freq);
     }
 };
 
@@ -62,7 +62,7 @@ tree *buildtree() // to build tree
         tree *smallright = minheap.top();
         minheap.pop();
         int parentfreq = smallleft->freq + smallright->freq;
-        tree *parent = new tree('\0', parentfreq, smallleft, smallright);
+        tree *parent = new tree(INTERNAL_NODE_CHARACTER, parentfreq, smallleft, smallright);
         minheap.push(parent);
     }
 
@@ -102,14 +102,14 @@ void encode(string filename, string encodefile)
     fout.open(encodefile, ios::app);
     ifstream fin;
     fin.open(filename);
-    while (fin)
+    char c;
+    while (fin.get(c))
     {
-        char c = fin.get();
-
         freqcount(c);
     }
-    tree *root = buildtree();
+    counter[PSEUDO_EOF] = 1;
 
+    tree *root = buildtree();
     assign(root, ""); // saare characters ko bitcode assign hon gayeeeee
     fin.close();
     /*
@@ -138,9 +138,9 @@ void encode(string filename, string encodefile)
 
     int bufcount = 0;
     char buff = '\0';
-    while (fin)
+
+    while (fin.get(c))
     {
-        char c = fin.get();
 
         string temp = bitcode[c];
         int lengthi = temp.size();
@@ -159,14 +159,35 @@ void encode(string filename, string encodefile)
             }
         }
     }
-    fout << PSEUDO_EOF;
+    string temp = bitcode[PSEUDO_EOF];
+    int lengthi = temp.size();
+    for (int i = 0; i < lengthi; i++)
+    {
+        if (temp[i] == '1')
+        {
+            buff |= 1 << (7 - bufcount);
+        }
+        bufcount++;
+        if (bufcount == 8)
+        {
+            fout << buff;
+            bufcount = 0;
+            buff = '\0';
+        }
+    }
+    if (buff != '\0')
+    {
+        fout << buff;
+    }
+    // fout << PSEUDO_EOF;
     fin.close();
+    fout.flush();
     fout.close();
 }
 
 void decode(string encodefilename, string decodefilename)
 {
-    string line;
+
     ofstream fout;
     ifstream fin;
     fout.open(decodefilename, ios::app);
@@ -197,10 +218,10 @@ void decode(string encodefilename, string decodefilename)
             fin.get(cr);
         }
     }
-    for (auto i : bitcode)
-    {
-        cout << i.first << " : " << i.second << "\n";
-    }
+    // for (auto i : bitcode)
+    // {
+    //     cout << i.first << " : " << i.second << "\n";
+    // }
     for (auto i : bitcode)
     {
         charac[i.second] = i.first;
@@ -208,30 +229,37 @@ void decode(string encodefilename, string decodefilename)
 
     string br = "";
     char ct;
-   fin.get(ct);
-    while (ct!=PSEUDO_EOF)
+
+    while (fin.get(ct))
     {
-        
-       
 
-            for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
+        {
+            if ((ct >> (7 - i)) & 1)
             {
-                if ((ct>> (7 - i)) & 1)
+                br += "1";
+            }
+            else
+            {
+                br += "0";
+            }
+            if (charac.count(br))
+            {
+                if (charac[br] == PSEUDO_EOF)
                 {
-                    br += "1";
+                    break;
                 }
-                else
+                fout << charac[br];
+                br = "";
+            }
+        }
+        if (charac.count(br))
+            {
+                if (charac[br] == PSEUDO_EOF)
                 {
-                    br += "0";
-                }
-                if (charac.count(br))
-                {
-
-                    fout << charac[br];
-                    br = "";
+                    break;
                 }
             }
-        fin.get(ct);
     }
 
     fin.close();
@@ -270,7 +298,7 @@ int main()
         // cout << "enter encodefile: ";
         // cin >> encodefile;
         // encode(filename, encodefile);
-        encode("sample.txt", "encode.txt");
+        encode("sample2.txt", "encode2.txt");
         break;
     case 2:
 
@@ -278,7 +306,7 @@ int main()
         // cin >> encodefile;
         // cout << "enter decodefile: ";
         // cin >> decodefile;
-        decode("encode.txt", "decode.txt");
+        decode("encode2.txt", "decode2.txt");
         break;
     // case 3:
     //     copy();
@@ -297,7 +325,7 @@ void assign(tree *root, string value) // to assign bitcode to all char in tree
         return;
     }
 
-    if (root->ch != '\0')
+    if (root->right == NULL && root->left == NULL)
     {
         bitcode[root->ch];
 
