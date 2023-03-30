@@ -326,73 +326,101 @@ int main()
     string encodefile;
     string decodefile;
     int ch1, ch2;
-    cout << "Press" << endl
-         << "\t 1. Encode " << endl
-         << "\t 2. Decode " << endl;
-    cin >> ch1;
-    switch (ch1)
+    ch1 = 0;
+    ch2 = 0;
+    while (ch1 != 3)
     {
-    case 1:
-        cout << "enter filename: ";
-        cin >> filename;
-        cout << "enter encodefile: ";
-        cin >> encodefile;
-        tree *root;
 
-        root = encode(filename, encodefile, counter, minheap);
-        cout << "Encoded Successfully !!" << endl
-             << endl;
-        cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code" << endl;
-        cin >> ch2;
-        switch (ch2)
+        cout << "Press\n"
+             << "\t 1. Encode \n"
+             << "\t 2. Decode \n"
+             << "\t 3. Exit \n";
+        cin >> ch1;
+        switch (ch1)
         {
         case 1:
-            cout << " Printing Tree " << endl
+            cout << "enter filename: ";
+            cin >> filename;
+            cout << "enter encodefile: ";
+            cin >> encodefile;
+            tree *root;
+
+            root = encode(filename, encodefile, counter, minheap);
+            cout << "Encoded Successfully !!" << endl
                  << endl;
-            printtree(root);
+            ch2 = 0;
+            while (ch2 != 3)
+            {
+                cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back" << endl;
+                cin >> ch2;
+                switch (ch2)
+                {
+                case 1:
+                    cout << " Printing Tree " << endl
+                         << endl;
+                    printtree(root);
+                    break;
+                case 2:
+                    cout << " Printing Binary code " << endl;
+                    for (auto i : bitcode)
+                    {
+                        cout << i.first << " : " << i.second << "\n";
+                    }
+                    break;
+                case 3:
+                    break;
+                default:
+                    cout << "Enter valid input\n";
+                    break;
+                }
+            }
             break;
         case 2:
-            cout << " Printing Binary code " << endl;
-            for (auto i : bitcode)
+            cout << "Enter encodefile: ";
+            cin >> encodefile;
+            cout << "Enter decodefile: ";
+            cin >> decodefile;
+            decode(encodefile, decodefile);
+            cout << "Decoded Successfully !!" << endl
+                 << endl;
+            ch2 = 0;
+            while (ch2 != 3)
             {
-                cout << i.first << " : " << i.second << "\n";
+                cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back" << endl;
+                cin >> ch2;
+                if (ch2 == 1)
+                {
+                    cout << " Printing Tree " << endl;
+                    tree *root2 = new tree(INTERNAL_NODE_CHARACTER);
+
+                    decodetree(root2);
+                    printdecode(root2);
+                }
+                else if (ch2 == 2)
+                {
+
+                    cout << " Printing Binary code " << endl;
+                    for (auto i : bitcode)
+                    {
+                        cout << i.first << " : " << i.second << "\n";
+                    }
+                }
+                else if (ch2 == 3)
+                {
+                }
+                else
+                {
+                    cout << "Enter correct input\n";
+                }
             }
+
+            break;
+        case 3:
             break;
         default:
+            cout << "Enter valid input\n";
             break;
         }
-        break;
-    case 2:
-        cout << "Enter encodefile: ";
-        cin >> encodefile;
-        cout << "Enter decodefile: ";
-        cin >> decodefile;
-        decode(encodefile, decodefile);
-        cout << "Decoded Successfully !!" << endl
-             << endl;
-        cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code" << endl;
-        cin >> ch2;
-        if (ch2 == 1)
-        {
-            cout << " Printing Tree " << endl;
-            tree *root2 = new tree(INTERNAL_NODE_CHARACTER);
-
-            decodetree(root2);
-            printdecode(root2);
-        }
-        else if (ch2 == 2)
-        {
-
-            cout << " Printing Binary code " << endl;
-            for (auto i : bitcode)
-            {
-                cout << i.first << " : " << i.second << "\n";
-            }
-        }
-
-        break;
-    default:
-        break;
     }
     return 0;
 }
@@ -426,13 +454,12 @@ void entry()
 
     string entry = "---------------WELCOME----------------";
 
-    string project = "DS LAB PBL";
+    string project = "APS LAB PBL";
 
     string made = " MADE BY";
     string name1 = "Akshansh Modi";
     string name2 = "Saumya Bansal";
     string name3 = "Armaan Sharma";
-    string name4 = "Arshika Porwal";
 
     string end = "--------------------------------------";
 
@@ -442,11 +469,7 @@ void entry()
         cout << entry[i];
         usleep(100000);
     }
-    // for (int i = 0; i < sizesmall; i++)
-    //    {
 
-    //        smallstr[i] = output[i];
-    //    }
     cout << "\n\t\t\t\t\t     ";
     for (int i = 0; i < project.length(); i++)
     {
@@ -475,13 +498,6 @@ void entry()
     for (int i = 0; i < name3.length(); i++)
     {
         cout << name3[i];
-        usleep(100000);
-    }
-
-    cout << "\n\t\t\t\t\t    ";
-    for (int i = 0; i < name4.length(); i++)
-    {
-        cout << name4[i];
         usleep(100000);
     }
     cout << "\n\t\t\t\t";
