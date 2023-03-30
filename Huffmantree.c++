@@ -10,9 +10,8 @@ using namespace std;
 #include <queue>
 #include <unistd.h>
 #include <windows.h>
-unordered_map<char, int> counter;
-
-void freqcount(char text) // assign frequency of occurance to characters
+void entry();
+void freqcount(char text, unordered_map<char, int> &counter) // assign frequency of occurance to characters
 {
 
     counter[text]++;
@@ -51,9 +50,7 @@ public:
     }
 };
 
-priority_queue<tree *, vector<tree *>, comparenode> minheap;
-
-tree *buildtree() // to build tree
+tree *buildtree(unordered_map<char, int> &counter, priority_queue<tree *, vector<tree *>, comparenode> &minheap) // to build tree
 {
     for (auto i : counter)
     {
@@ -74,35 +71,11 @@ tree *buildtree() // to build tree
 
     return minheap.top();
 }
-/*
-void printtree(tree *root) // to check tree made
-{
-    if (root == NULL)
-    {
-        return;
-    }
-    if (root->ch != '\0')
-    {
-        cout << root->ch << ":" << root->freq;
-    }
-    else
-    {
-        cout << ":" << root->freq;
-    }
-    cout << "\n";
-    cout << " L:";
-    printtree(root->left);
-    cout << " R:";
-    printtree(root->right);
-    cout << "\n";
 
-    return;
-}*/
-//
 unordered_map<char, string> bitcode;
 unordered_map<string, char> charac;
-// tree *
-void encode(string filename, string encodefile)
+
+tree *encode(string filename, string encodefile, unordered_map<char, int> &counter, priority_queue<tree *, vector<tree *>, comparenode> &minheap)
 {
 
     ofstream fout;
@@ -112,24 +85,14 @@ void encode(string filename, string encodefile)
     char c;
     while (fin.get(c))
     {
-        freqcount(c);
+        freqcount(c, counter);
     }
     counter[PSEUDO_EOF] = 1;
 
-    tree *root = buildtree();
-    assign(root, ""); // saare characters ko bitcode assign hon gayeeeee
+    tree *root = buildtree(counter, minheap);
+    assign(root, "");
     fin.close();
-    /*
-     for (auto i : counter)
-     {
-         cout << i.first << " : " << i.second << "\n";
-     }
-     cout << "\n\n";
-     for (auto i : bitcode)
-     {
-         cout << i.first << " : " << i.second << "\n";
-     }
- */
+
     fin.open(filename);
     char cr;
     string code;
@@ -186,20 +149,19 @@ void encode(string filename, string encodefile)
     {
         fout << buff;
     }
-    // fout << PSEUDO_EOF;
+
     fin.close();
     fout.flush();
     fout.close();
-    // return root;
+    return root;
 }
-
 void decode(string encodefilename, string decodefilename)
 {
-
     ofstream fout;
     ifstream fin;
-    fout.open(decodefilename, ios::app);
-    fin.open(encodefilename);
+    fout.open(decodefilename, ios::binary);
+    fin.open(encodefilename, ios::binary);
+
     char cr;
     char key;
     string code;
@@ -208,10 +170,8 @@ void decode(string encodefilename, string decodefilename)
 
     while (cr != HEADER_TEXT_SEPERATOR)
     {
-
         if (cr == CHARACTER_CODE_SEPERATOR)
         {
-
             fin.get(cr);
             while (cr != HEADER_ENTRY_SEPERATOR)
             {
@@ -219,17 +179,10 @@ void decode(string encodefilename, string decodefilename)
                 fin.get(cr);
             }
         }
-
-        else
-        {
-            key = cr;
-            fin.get(cr);
-        }
+        key = cr;
+        fin.get(cr);
     }
-    // for (auto i : bitcode)
-    // {
-    //     cout << i.first << " : " << i.second << "\n";
-    // }
+
     for (auto i : bitcode)
     {
         charac[i.second] = i.first;
@@ -238,9 +191,8 @@ void decode(string encodefilename, string decodefilename)
     string br = "";
     char ct;
 
-    while (fin.get(ct))
+    while (!fin.eof() && fin.get(ct))
     {
-
         for (int i = 0; i < 8; i++)
         {
             if ((ct >> (7 - i)) & 1)
@@ -261,37 +213,47 @@ void decode(string encodefilename, string decodefilename)
                 br = "";
             }
         }
-        if (charac.count(br))
-        {
-            if (charac[br] == PSEUDO_EOF)
-            {
-                break;
-            }
-        }
     }
 
     fin.close();
+    fout.flush();
     fout.close();
 }
 
-// void entry();
+void printtree(tree *root) // to check tree made
+{
+    if (root == NULL)
+    {
+        return;
+    }
+    if (root->ch != '\0')
+    {
+        cout << root->ch << ":" << root->freq;
+    }
+    else
+    {
+        cout << ":" << root->freq;
+    }
+    cout << "\n";
+    cout << " L:";
+    printtree(root->left);
+    cout << " R:";
+    printtree(root->right);
+    cout << "\n";
 
-// void attach(tree *root, char c, string i.second)
-// {
-
-//     return;
-// }
+    return;
+}
 tree *decodetree(tree *root)
 {
 
     tree *temp;
     for (auto i : bitcode)
     {
-        tree *temp = root;
+        temp = root;
         string bits = i.second;
         int j = bits.size() - 1;
-
-        for (int k = 0; k < bits.size(); k++)
+        int sizeb = bits.size();
+        for (int k = 0; k < sizeb; k++)
         {
 
             if (bits[k] == '1')
@@ -312,7 +274,7 @@ tree *decodetree(tree *root)
             }
             else
             {
-              if (k == j)
+                if (k == j)
                 {
                     temp->left = new tree(i.first);
                 }
@@ -355,42 +317,14 @@ void printdecode(tree *root)
 }
 int main()
 {
-    // SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
-    // entry();
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+    entry();
+
+    unordered_map<char, int> counter;
+    priority_queue<tree *, vector<tree *>, comparenode> minheap;
     string filename;
     string encodefile;
     string decodefile;
-    /*
-     cout << "\n1. Encode\n2. Decode\n";
-     int x;
-     cin >> x;
-     switch (x)
-     {
-     case 1:
-         // cout << "enter filename: ";
-         // cin >> filename;
-         // cout << "enter encodefile: ";^
-         // cin >> encodefile;
-         // tree * root = encode(filename, encodefile);
-         // tree * root =
-         encode("sample.txt", "encode.txt");
-
-         break;
-     case 2:
-
-         // cout << "enter encodefile: ";
-         // cin >> encodefile;
-         // cout << "enter decodefile: ";
-         // cin >> decodefile;
-         decode("encode.txt", "decode.txt");
-         break;
-     // case 3:
-     //     copy();
-     //     break;
-     default:
-         break;
-     }
-     */
     int ch1, ch2;
     cout << "Press" << endl
          << "\t 1. Encode " << endl
@@ -399,39 +333,41 @@ int main()
     switch (ch1)
     {
     case 1:
-        // cout << "enter filename: ";
-        // cin >> filename;
-        // cout << "enter encodefile: ";
-        // cin >> encodefile;
-        // encode(filename, encodefile);
-        // tree *root =
-        encode("sample2.txt", "encode2.txt");
+        cout << "enter filename: ";
+        cin >> filename;
+        cout << "enter encodefile: ";
+        cin >> encodefile;
+        tree *root;
+
+        root = encode(filename, encodefile, counter, minheap);
         cout << "Encoded Successfully !!" << endl
              << endl;
-        // cout<<"\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code"<<endl;
-        // cin>>ch2;
-        // switch(ch2){
-        //     case 1:
-        //         cout<<" Printing Tree "<<endl<<endl;
-        //         printtree(root);
-        //         break;
-        //     case 2:
-        //         cout<<" Printing Binary code "<<endl;
-        //         for (auto i : bitcode)
-        //          {
-        //              cout << i.first << " : " << i.second<< "\n";
-        //          }
-        //         break;
-        //     default:
-        //         break;
-        // }
+        cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code" << endl;
+        cin >> ch2;
+        switch (ch2)
+        {
+        case 1:
+            cout << " Printing Tree " << endl
+                 << endl;
+            printtree(root);
+            break;
+        case 2:
+            cout << " Printing Binary code " << endl;
+            for (auto i : bitcode)
+            {
+                cout << i.first << " : " << i.second << "\n";
+            }
+            break;
+        default:
+            break;
+        }
         break;
     case 2:
-        // cout << "Enter encodefile: ";
-        // cin >> encodefile;
-        // cout << "Enter decodefile: ";
-        // cin >> decodefile;
-        decode("encode2.txt", "decode2.txt");
+        cout << "Enter encodefile: ";
+        cin >> encodefile;
+        cout << "Enter decodefile: ";
+        cin >> decodefile;
+        decode(encodefile, decodefile);
         cout << "Decoded Successfully !!" << endl
              << endl;
         cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code" << endl;
@@ -485,74 +421,74 @@ void assign(tree *root, string value) // to assign bitcode to all char in tree
     return;
 }
 
-// void entry()
-// {
+void entry()
+{
 
-//     string entry = "---------------WELCOME----------------";
+    string entry = "---------------WELCOME----------------";
 
-//     string project = "DS LAB PBL";
+    string project = "DS LAB PBL";
 
-//     string made = " MADE BY";
-//     string name1 = "Akshansh Modi";
-//     string name2 = "Saumya Bansal";
-//     string name3 = "Armaan Sharma";
-//     string name4 = "Arshika Porwal";
+    string made = " MADE BY";
+    string name1 = "Akshansh Modi";
+    string name2 = "Saumya Bansal";
+    string name3 = "Armaan Sharma";
+    string name4 = "Arshika Porwal";
 
-//     string end = "--------------------------------------";
+    string end = "--------------------------------------";
 
-//     cout << "\t\t\t\t";
-//     for (int i = 0; i < entry.length(); i++)
-//     {
-//         cout << entry[i];
-//         usleep(100000);
-//     }
-//     // for (int i = 0; i < sizesmall; i++)
-//     //    {
+    cout << "\t\t\t\t";
+    for (int i = 0; i < entry.length(); i++)
+    {
+        cout << entry[i];
+        usleep(100000);
+    }
+    // for (int i = 0; i < sizesmall; i++)
+    //    {
 
-//     //        smallstr[i] = output[i];
-//     //    }
-//     cout << "\n\t\t\t\t\t     ";
-//     for (int i = 0; i < project.length(); i++)
-//     {
-//         cout << project[i];
-//         usleep(100000);
-//     }
-//     cout << "\n\t\t\t\t\t      ";
-//     for (int i = 0; i < made.length(); i++)
-//     {
-//         cout << made[i];
-//         usleep(100000);
-//     }
-//     cout << "\n\t\t\t\t\t    ";
-//     for (int i = 0; i < name1.length(); i++)
-//     {
-//         cout << name1[i];
-//         usleep(100000);
-//     }
-//     cout << "\n\t\t\t\t\t    ";
-//     for (int i = 0; i < name2.length(); i++)
-//     {
-//         cout << name2[i];
-//         usleep(100000);
-//     }
-//     cout << "\n\t\t\t\t\t    ";
-//     for (int i = 0; i < name3.length(); i++)
-//     {
-//         cout << name3[i];
-//         usleep(100000);
-//     }
+    //        smallstr[i] = output[i];
+    //    }
+    cout << "\n\t\t\t\t\t     ";
+    for (int i = 0; i < project.length(); i++)
+    {
+        cout << project[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t      ";
+    for (int i = 0; i < made.length(); i++)
+    {
+        cout << made[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name1.length(); i++)
+    {
+        cout << name1[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name2.length(); i++)
+    {
+        cout << name2[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name3.length(); i++)
+    {
+        cout << name3[i];
+        usleep(100000);
+    }
 
-//     cout << "\n\t\t\t\t\t    ";
-//     for (int i = 0; i < name4.length(); i++)
-//     {
-//         cout << name4[i];
-//         usleep(100000);
-//     }
-//     cout << "\n\t\t\t\t";
+    cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < name4.length(); i++)
+    {
+        cout << name4[i];
+        usleep(100000);
+    }
+    cout << "\n\t\t\t\t";
 
-//     for (int i = 0; i < end.length(); i++)
-//     {
-//         cout << end[i];
-//         usleep(100000);
-//     }
-// }
+    for (int i = 0; i < end.length(); i++)
+    {
+        cout << end[i];
+        usleep(100000);
+    }
+}
