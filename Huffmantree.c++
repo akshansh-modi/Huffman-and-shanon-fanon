@@ -1,5 +1,5 @@
 #include <iostream>
-using namespace std;
+
 #include <fstream>
 #define INTERNAL_NODE_CHARACTER char(188)
 #define PSEUDO_EOF char(129)
@@ -11,7 +11,7 @@ using namespace std;
 #include <unistd.h>
 #include <windows.h>
 void entry();
-void freqcount(char text, unordered_map<char, int> &counter) // assign frequency of occurance to characters
+void freqcount(char text, std::unordered_map<char, int> &counter) // assign frequency of occurance to characters
 {
 
     counter[text]++;
@@ -39,7 +39,7 @@ public:
     }
 };
 
-void assign(tree *root, string value);
+void assign(tree *root, std::string value);
 class comparenode // for making of minimum priority queue
 {
 public:
@@ -50,7 +50,7 @@ public:
     }
 };
 
-tree *buildtree(unordered_map<char, int> &counter, priority_queue<tree *, vector<tree *>, comparenode> &minheap) // to build tree
+tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree *, std::vector<tree *>, comparenode> &minheap) // to build tree
 {
     for (auto i : counter)
     {
@@ -72,15 +72,15 @@ tree *buildtree(unordered_map<char, int> &counter, priority_queue<tree *, vector
     return minheap.top();
 }
 
-unordered_map<char, string> bitcode;
-unordered_map<string, char> charac;
+std::unordered_map<char, std::string> bitcode;
+std::unordered_map<std::string, char> charac;
 
-tree *encode(string filename, string encodefile, unordered_map<char, int> &counter, priority_queue<tree *, vector<tree *>, comparenode> &minheap)
+tree *encode(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::priority_queue<tree *, std::vector<tree *>, comparenode> &minheap)
 {
 
-    ofstream fout;
-    fout.open(encodefile, ios::app);
-    ifstream fin;
+    std::ofstream fout;
+    fout.open(encodefile, std::ios::app);
+    std::ifstream fin;
     fin.open(filename);
     char c;
     while (fin.get(c))
@@ -95,7 +95,7 @@ tree *encode(string filename, string encodefile, unordered_map<char, int> &count
 
     fin.open(filename);
     char cr;
-    string code;
+    std::string code;
 
     for (auto i : bitcode)
     {
@@ -112,7 +112,7 @@ tree *encode(string filename, string encodefile, unordered_map<char, int> &count
     while (fin.get(c))
     {
 
-        string temp = bitcode[c];
+        std::string temp = bitcode[c];
         int lengthi = temp.size();
         for (int i = 0; i < lengthi; i++)
         {
@@ -129,7 +129,7 @@ tree *encode(string filename, string encodefile, unordered_map<char, int> &count
             }
         }
     }
-    string temp = bitcode[PSEUDO_EOF];
+    std::string temp = bitcode[PSEUDO_EOF];
     int lengthi = temp.size();
     for (int i = 0; i < lengthi; i++)
     {
@@ -155,16 +155,16 @@ tree *encode(string filename, string encodefile, unordered_map<char, int> &count
     fout.close();
     return root;
 }
-void decode(string encodefilename, string decodefilename)
+void decode(std::string encodefilename, std::string decodefilename)
 {
-    ofstream fout;
-    ifstream fin;
-    fout.open(decodefilename, ios::binary);
-    fin.open(encodefilename, ios::binary);
+    std::ofstream fout;
+    std::ifstream fin;
+    fout.open(decodefilename, std::ios::binary);
+    fin.open(encodefilename, std::ios::binary);
 
     char cr;
     char key;
-    string code;
+    std::string code;
     cr = fin.get();
     key = cr;
 
@@ -188,7 +188,7 @@ void decode(string encodefilename, string decodefilename)
         charac[i.second] = i.first;
     }
 
-    string br = "";
+    std::string br = "";
     char ct;
 
     while (!fin.eof() && fin.get(ct))
@@ -228,18 +228,18 @@ void printtree(tree *root) // to check tree made
     }
     if (root->ch != '\0')
     {
-        cout << root->ch << ":" << root->freq;
+        std::cout << root->ch << ":" << root->freq;
     }
     else
     {
-        cout << ":" << root->freq;
+        std::cout << ":" << root->freq;
     }
-    cout << "\n";
-    cout << " L:";
+    std::cout << "\n";
+    std::cout << " L:";
     printtree(root->left);
-    cout << " R:";
+    std::cout << " R:";
     printtree(root->right);
-    cout << "\n";
+    std::cout << "\n";
 
     return;
 }
@@ -250,7 +250,7 @@ tree *decodetree(tree *root)
     for (auto i : bitcode)
     {
         temp = root;
-        string bits = i.second;
+        std::string bits = i.second;
         int j = bits.size() - 1;
         int sizeb = bits.size();
         for (int k = 0; k < sizeb; k++)
@@ -300,97 +300,104 @@ void printdecode(tree *root)
     }
     if (root->ch != INTERNAL_NODE_CHARACTER)
     {
-        cout << root->ch;
+        std::cout << root->ch;
     }
     else
     {
-        cout << ":";
+        std::cout << ":";
     }
-    cout << "\n";
-    cout << " L:";
+    std::cout << "\n";
+    std::cout << " L:";
     printdecode(root->left);
-    cout << " R:";
+    std::cout << " R:";
     printdecode(root->right);
-    cout << "\n";
+    std::cout << "\n";
 
     return;
 }
 int main()
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
-    entry();
+    // entry();
 
-    unordered_map<char, int> counter;
-    priority_queue<tree *, vector<tree *>, comparenode> minheap;
-    string filename;
-    string encodefile;
-    string decodefile;
+    std::unordered_map<char, int> counter;
+    std::priority_queue<tree *, std::vector<tree *>, comparenode> minheap;
+    std::string filename;
+    std::string encodefile;
+    std::string decodefile;
     int ch1, ch2;
     ch1 = 0;
     ch2 = 0;
     while (ch1 != 3)
     {
 
-        cout << "Press\n"
-             << "\t 1. Encode \n"
-             << "\t 2. Decode \n"
-             << "\t 3. Exit \n";
-        cin >> ch1;
+        std::cout << "Press\n"
+                  << "\t 1. Encode \n"
+                  << "\t 2. Decode \n"
+                  << "\t 3. Exit \n";
+        std::cin >> ch1;
         switch (ch1)
         {
         case 1:
-            cout << "enter filename: ";
-            cin >> filename;
-            cout << "enter encodefile: ";
-            cin >> encodefile;
+            std::cout << "enter filename: ";
+            std::cin >> filename;
+            std::cout << "enter encodefile: ";
+            std::cin >> encodefile;
             tree *root;
 
             root = encode(filename, encodefile, counter, minheap);
-            cout << "Encoded Successfully !!" << endl
-                 << endl;
+            std::cout << "Encoded Successfully !!"
+                      << "\n"
+                      << "\n";
             ch2 = 0;
             while (ch2 != 3)
             {
-                cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back" << endl;
-                cin >> ch2;
+                std::cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back"
+                          << "\n";
+                std::cin >> ch2;
                 switch (ch2)
                 {
                 case 1:
-                    cout << " Printing Tree " << endl
-                         << endl;
+                    std::cout << " Printing Tree "
+                              << "\n"
+                              << "\n";
                     printtree(root);
                     break;
                 case 2:
-                    cout << " Printing Binary code " << endl;
+                    std::cout << " Printing Binary code "
+                              << "\n";
                     for (auto i : bitcode)
                     {
-                        cout << i.first << " : " << i.second << "\n";
+                        std::cout << i.first << " : " << i.second << "\n";
                     }
                     break;
                 case 3:
                     break;
                 default:
-                    cout << "Enter valid input\n";
+                    std::cout << "Enter valid input\n";
                     break;
                 }
             }
             break;
         case 2:
-            cout << "Enter encodefile: ";
-            cin >> encodefile;
-            cout << "Enter decodefile: ";
-            cin >> decodefile;
+            std::cout << "Enter encodefile: ";
+            std::cin >> encodefile;
+            std::cout << "Enter decodefile: ";
+            std::cin >> decodefile;
             decode(encodefile, decodefile);
-            cout << "Decoded Successfully !!" << endl
-                 << endl;
+            std::cout << "Decoded Successfully !!"
+                      << "\n"
+                      << "\n";
             ch2 = 0;
             while (ch2 != 3)
             {
-                cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back" << endl;
-                cin >> ch2;
+                std::cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back"
+                          << "\n";
+                std::cin >> ch2;
                 if (ch2 == 1)
                 {
-                    cout << " Printing Tree " << endl;
+                    std::cout << " Printing Tree "
+                              << "\n";
                     tree *root2 = new tree(INTERNAL_NODE_CHARACTER);
 
                     decodetree(root2);
@@ -399,10 +406,11 @@ int main()
                 else if (ch2 == 2)
                 {
 
-                    cout << " Printing Binary code " << endl;
+                    std::cout << " Printing Binary code "
+                              << "\n";
                     for (auto i : bitcode)
                     {
-                        cout << i.first << " : " << i.second << "\n";
+                        std::cout << i.first << " : " << i.second << "\n";
                     }
                 }
                 else if (ch2 == 3)
@@ -410,7 +418,7 @@ int main()
                 }
                 else
                 {
-                    cout << "Enter correct input\n";
+                    std::cout << "Enter correct input\n";
                 }
             }
 
@@ -418,14 +426,14 @@ int main()
         case 3:
             break;
         default:
-            cout << "Enter valid input\n";
+            std::cout << "Enter valid input\n";
             break;
         }
     }
     return 0;
 }
 
-void assign(tree *root, string value) // to assign bitcode to all char in tree
+void assign(tree *root, std::string value) // to assign bitcode to all char in tree
 {
     if (root == NULL)
     {
@@ -440,8 +448,8 @@ void assign(tree *root, string value) // to assign bitcode to all char in tree
         return;
     }
 
-    string valueright = value + "1";
-    string valueleft = value + "0";
+    std::string valueright = value + "1";
+    std::string valueleft = value + "0";
 
     assign(root->left, valueleft);
     assign(root->right, valueright);
@@ -452,59 +460,66 @@ void assign(tree *root, string value) // to assign bitcode to all char in tree
 void entry()
 {
 
-    string entry = "---------------WELCOME----------------";
+    std::string entry = "---------------WELCOME----------------";
 
-    string project = "APS LAB PBL";
+    std::string project = "APS LAB PBL";
 
-    string made = " MADE BY";
-    string name1 = "Akshansh Modi";
-    string name2 = "Saumya Bansal";
-    string name3 = "Armaan Sharma";
+    std::string made = " MADE BY";
+    std::string name1 = "Akshansh Modi";
+    std::string name2 = "Saumya Bansal";
+    std::string name3 = "Armaan Sharma";
 
-    string end = "--------------------------------------";
+    std::string end = "--------------------------------------";
 
-    cout << "\t\t\t\t";
-    for (int i = 0; i < entry.length(); i++)
+    std::cout << "\t\t\t\t";
+    int el = entry.length();
+    int pl = project.length();
+    int ml = made.length();
+    int nl = name1.length();
+    int nl2 = name2.length();
+    int nl3 = name3.length();
+    int endlength = end.length();
+    for (int i = 0; i < el; i++)
     {
-        cout << entry[i];
+        std::cout << entry[i];
         usleep(100000);
     }
 
-    cout << "\n\t\t\t\t\t     ";
-    for (int i = 0; i < project.length(); i++)
+    std::cout << "\n\t\t\t\t\t     ";
+    for (int i = 0; i < pl; i++)
     {
-        cout << project[i];
+        std::cout << project[i];
         usleep(100000);
     }
-    cout << "\n\t\t\t\t\t      ";
-    for (int i = 0; i < made.length(); i++)
+    std::cout << "\n\t\t\t\t\t      ";
+    for (int i = 0; i < ml; i++)
     {
-        cout << made[i];
+        std::cout << made[i];
         usleep(100000);
     }
-    cout << "\n\t\t\t\t\t    ";
-    for (int i = 0; i < name1.length(); i++)
+    std::cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < nl; i++)
     {
-        cout << name1[i];
+        std::cout << name1[i];
         usleep(100000);
     }
-    cout << "\n\t\t\t\t\t    ";
-    for (int i = 0; i < name2.length(); i++)
+    std::cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < nl2; i++)
     {
-        cout << name2[i];
+        std::cout << name2[i];
         usleep(100000);
     }
-    cout << "\n\t\t\t\t\t    ";
-    for (int i = 0; i < name3.length(); i++)
+    std::cout << "\n\t\t\t\t\t    ";
+    for (int i = 0; i < nl3; i++)
     {
-        cout << name3[i];
+        std::cout << name3[i];
         usleep(100000);
     }
-    cout << "\n\t\t\t\t";
+    std::cout << "\n\t\t\t\t";
 
-    for (int i = 0; i < end.length(); i++)
+    for (int i = 0; i < endlength; i++)
     {
-        cout << end[i];
+        std::cout << end[i];
         usleep(100000);
     }
 }
