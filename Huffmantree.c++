@@ -10,36 +10,15 @@
 #include <queue>
 #include <unistd.h>
 #include <windows.h>
+#include "huffman.h"
 void entry();
 void freqcount(char text, std::unordered_map<char, int> &counter) // assign frequency of occurance to characters
 {
 
     counter[text]++;
 }
-class tree
-{
-public:
-    char ch;
-    int freq;
-    tree *right;
-    tree *left;
-    tree() {}
-    tree(char ch, tree *left = NULL, tree *right = NULL)
-    {
-        this->ch = ch;
-        this->left = left;
-        this->right = right;
-    }
-    tree(char ch, int freq, tree *left = NULL, tree *right = NULL)
-    {
-        this->ch = ch;
-        this->freq = freq;
-        this->left = left;
-        this->right = right;
-    }
-};
 
-void assign(tree *root, std::string value);
+void assign(tree *root, std::string value, std::unordered_map<char, std::string> &bitcode);
 class comparenode // for making of minimum priority queue
 {
 public:
@@ -72,14 +51,11 @@ tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree
     return minheap.top();
 }
 
-std::unordered_map<char, std::string> bitcode;
-std::unordered_map<std::string, char> charac;
-
-tree *encode(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::priority_queue<tree *, std::vector<tree *>, comparenode> &minheap)
+tree *encode(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::priority_queue<tree *, std::vector<tree *>, comparenode> &minheap, std::unordered_map<char, std::string> &bitcode)
 {
 
     std::ofstream fout;
-    fout.open(encodefile, std::ios::app);
+    fout.open(encodefile, std::ios::app | std::ios::binary);
     std::ifstream fin;
     fin.open(filename);
     char c;
@@ -90,7 +66,7 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
     counter[PSEUDO_EOF] = 1;
 
     tree *root = buildtree(counter, minheap);
-    assign(root, "");
+    assign(root, "", bitcode);
     fin.close();
 
     fin.open(filename);
@@ -155,7 +131,7 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
     fout.close();
     return root;
 }
-void decode(std::string encodefilename, std::string decodefilename)
+void decode(std::string encodefilename, std::string decodefilename, std::unordered_map<char, std::string> &bitcode, std::unordered_map<std::string, char> &charac)
 {
     std::ofstream fout;
     std::ifstream fin;
@@ -243,7 +219,8 @@ void printtree(tree *root) // to check tree made
 
     return;
 }
-tree *decodetree(tree *root)
+
+tree *decodetree(tree *root, std::unordered_map<char, std::string> &bitcode)
 {
 
     tree *temp;
@@ -322,6 +299,8 @@ int main()
 
     std::unordered_map<char, int> counter;
     std::priority_queue<tree *, std::vector<tree *>, comparenode> minheap;
+    std::unordered_map<char, std::string> bitcode;
+    std::unordered_map<std::string, char> charac;
     std::string filename;
     std::string encodefile;
     std::string decodefile;
@@ -345,7 +324,7 @@ int main()
             std::cin >> encodefile;
             tree *root;
 
-            root = encode(filename, encodefile, counter, minheap);
+            root = encode(filename, encodefile, counter, minheap, bitcode);
             std::cout << "Encoded Successfully !!"
                       << "\n"
                       << "\n";
@@ -384,7 +363,7 @@ int main()
             std::cin >> encodefile;
             std::cout << "Enter decodefile: ";
             std::cin >> decodefile;
-            decode(encodefile, decodefile);
+            decode(encodefile, decodefile, bitcode, charac);
             std::cout << "Decoded Successfully !!"
                       << "\n"
                       << "\n";
@@ -400,7 +379,7 @@ int main()
                               << "\n";
                     tree *root2 = new tree(INTERNAL_NODE_CHARACTER);
 
-                    decodetree(root2);
+                    decodetree(root2, bitcode);
                     printdecode(root2);
                 }
                 else if (ch2 == 2)
@@ -433,7 +412,7 @@ int main()
     return 0;
 }
 
-void assign(tree *root, std::string value) // to assign bitcode to all char in tree
+void assign(tree *root, std::string value, std::unordered_map<char, std::string> &bitcode) // to assign bitcode to all char in tree
 {
     if (root == NULL)
     {
@@ -451,8 +430,8 @@ void assign(tree *root, std::string value) // to assign bitcode to all char in t
     std::string valueright = value + "1";
     std::string valueleft = value + "0";
 
-    assign(root->left, valueleft);
-    assign(root->right, valueright);
+    assign(root->left, valueleft,bitcode);
+    assign(root->right, valueright,bitcode);
 
     return;
 }
