@@ -18,90 +18,93 @@ void freqcount(char text, std::unordered_map<char, int> &counter) // assign freq
 
     counter[text]++;
 }
-int calctotal(std::unordered_map<char, int> &counter)
+// int calctotal(std::unordered_map<char, int> &counter)
+// {
+//     int total = 0;
+//     for (auto i : counter)
+//     {
+//         total += i.second;
+//     }
+
+//     return total;
+// }
+void prcount(vector<pair<char, float>> &p, std::unordered_map<char, int> counter)
 {
-    int total = 0;
+    char first;
+    float second;
+int total =0;
     for (auto i : counter)
     {
         total += i.second;
     }
+    for (auto i : counter)
+    {
+        first = i.first;
+        second = ((float)i.second / (float)total);
+        p.push_back(make_pair(first, second));
+    }
+}
 
-    return total;
+int findbreak(vector<pair<char, float>> A, int start, int end)
+{
+    float sum = 0;
+    for (int i = start; i <= end; i++)
+    {
+        sum += A[i].second;
+    }
+
+    float half = sum / 2;
+    float s = 0;
+    for (int j = start; j < end; j++)
+    {
+        s += A[j].second;
+
+        if (s >= half)
+        {
+            if (j == start || s == half)
+            {
+                return j;
+            }
+            float prevs = s - A[j - 1].second;
+            if ((half - prevs) < (s - half))
+                return j - 1;
+            return j;
+        }
+    }
+
+    return start;
 }
 bool cmp(pair<char, float> &a, pair<char, float> &b)
 {
     return a.second > b.second;
 }
-void probability(vector<pair<char, float>> &p, std::unordered_map<char, int> counter, int total)
-{
-    float second;
-    char first;
-    for (auto i : counter)
-    {
-        second = ((float)i.second / (float)total);
-        first = i.first;
-        p.push_back(make_pair(first, second));
-    }
-    sort(p.begin(), p.end(), cmp);
-}
-float diff(float a, float b) { return (float)(b - a); }
-int findbreak(vector<pair<char, float>> p, int start, int end)
-{
-    float total = 0;
-    for (int i = start; i <= end; i++)
-    {
-        total += p[i].second;
-    }
-
-    float target = total / (float)2;
-    float sum = 0;
-    for (int i = start; i < end; i++)
-    {
-        sum += p[i].second;
-
-        if (sum >= target)
-        {
-            if (i == start || sum == target)
-            {
-                return i;
-            }
-            float prevsum = sum - p[i - 1].second;
-            float diff1 = diff(prevsum, target);
-            float diff2 = diff(target, sum);
-            if (diff1 > diff2)
-            {
-                return i;
-            }
-            return i - 1;
-        }
-    }
-    return start;
-}
-void assignsf(std::unordered_map<char, std::string> &bitcode, vector<pair<char, float>> p, int start, int end, string value)
+void assignsf(vector<pair<char, string>> &v, vector<pair<char, float>> p, int start, int end)
 {
     int size = end - start + 1;
     char ch;
-    if (size < 1)
+    if (size <= 1)
     {
         return;
     }
-    if (size == 1)
+
+    int j = findbreak(p, start, end);
+    for (int k = start; k < (j + 1); k++)
     {
-        ch = p[start].first;
-        bitcode[ch] += value;
-        return;
+        char first = p[k].first;
+
+      
+        v[k].second += "0";
+
+    }
+    for (int k = j + 1; k <= end; k++)
+    {
+        char first = p[k].first;
+        v[k].second += "1";
+       
     }
 
-    for (int i = start; i <= end; i++)
-    {
-        ch = p[i].first;
-        bitcode[ch] += value;
-    }
-
-    int indbreak = findbreak(p, start, end);
-
-    assignsf(bitcode, p, start, indbreak, "0");
-    assignsf(bitcode, p, indbreak + 1, end, "1");
+    assignsf(v, p, start, j);
+    assignsf(v, p, j + 1, end);
 
     return;
 }
@@ -150,10 +153,21 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
         freqcount(c, counter);
     }
     counter[PSEUDO_EOF] = 1;
-    int total = calctotal(counter);
-    probability(p, counter, total);
+    // int total = calctotal(counter);
+    prcount(p, counter);
+    sort(p.begin(), p.end(), cmp);
     int sizep = p.size();
-    assignsf(bitcode, p, 0, sizep - 1, "");
+    vector<pair<char, string>> v;
+    for (int i = 0; i < sizep; i++)
+    {
+        v.push_back(make_pair(p[i].first, ""));
+    }
+    assignsf(v, p, 0, sizep - 1);
+    for (auto i : v)
+    {
+
+        bitcode[i.first] = i.second;
+    }
     // for (auto i : bitcode)
     // {
     //     cout << i.first << ": " << i.second << "\n";
