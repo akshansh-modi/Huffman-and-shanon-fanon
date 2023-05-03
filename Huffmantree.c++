@@ -12,13 +12,6 @@
 #include <windows.h>
 #include "huffman.h"
 #include <algorithm>
-int filesize(std::string filename)
-{
-    std::fstream in_file("a.txt", std::ios::binary);
-    in_file.seekg(0, std::ios::end);
-    int file_size = in_file.tellg();
-    return file_size;
-}
 
 void entry();
 void freqcount(char text, std::unordered_map<char, int> &counter) // assign frequency of occurance to characters
@@ -146,7 +139,7 @@ tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree
 }
 void encodesf(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::unordered_map<char, std::string> &bitcode, std::vector<std::pair<char, float>> &p)
 {
-int esize=0;
+    int esize = 0;
     std::ofstream fout;
     fout.open(encodefile, std::ios::app);
     std::ifstream fin;
@@ -186,11 +179,11 @@ int esize=0;
     {
         cr = i.first;
         code = i.second;
-esize+=3+code.length();
+        esize += 3 + code.length();
         fout << cr << CHARACTER_CODE_SEPERATOR << code << HEADER_ENTRY_SEPERATOR;
     }
     fout << HEADER_TEXT_SEPERATOR;
-esize++;
+    esize++;
     int bufcount = 0;
     char buff = '\0';
 
@@ -207,7 +200,8 @@ esize++;
             }
             bufcount++;
             if (bufcount == 8)
-            {esize++;
+            {
+                esize++;
                 fout << buff;
                 bufcount = 0;
                 buff = '\0';
@@ -224,14 +218,16 @@ esize++;
         }
         bufcount++;
         if (bufcount == 8)
-        {esize++;
+        {
+            esize++;
             fout << buff;
             bufcount = 0;
             buff = '\0';
         }
     }
     if (buff != '\0')
-    {esize++;
+    {
+        esize++;
         fout << buff;
     }
     int osize = calctotal(counter) - 1;
