@@ -141,7 +141,7 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
 {
     int esize = 0;
     std::ofstream fout;
-    fout.open(encodefile, std::ios::app);
+    fout.open(encodefile, std::ios::app | std::ios::binary);
     std::ifstream fin;
     fin.open(filename);
     char c;
@@ -240,7 +240,7 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
 {
     int esize = 0;
     std::ofstream fout;
-    fout.open(encodefile, std::ios::app);
+    fout.open(encodefile, std::ios::app | std::ios::binary);
     std::ifstream fin;
     fin.open(filename);
     char c;
@@ -326,8 +326,8 @@ void decode(std::string encodefilename, std::string decodefilename, std::unorder
 {
     std::ofstream fout;
     std::ifstream fin;
-    fout.open(decodefilename);
-    fin.open(encodefilename, std::ios::binary);
+    fout.open(decodefilename, std::ios::app);
+    fin.open(encodefilename, std::ios::app | std::ios::binary);
 
     char cr;
     char key;
@@ -564,10 +564,12 @@ int main()
             else if (choice == 2)
             {
                 encodesf(filename, encodefile, counter, bitcode, p);
-                std::cout << "\t\t 1. Print Probabilites \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n";
                 ch2 = 0;
+                std::cout << "\t\t 1. Print Probabilites \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n";
+
                 while (ch2 != 3)
                 {
+                    std::cin >> ch2;
                     switch (ch2)
                     {
                     case 1:
