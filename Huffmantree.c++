@@ -32,7 +32,7 @@ void prcount(vector<pair<char, float>> &p, std::unordered_map<char, int> counter
 {
     char first;
     float second;
-int total =0;
+    int total = 0;
     for (auto i : counter)
     {
         total += i.second;
@@ -90,17 +90,13 @@ void assignsf(vector<pair<char, string>> &v, vector<pair<char, float>> p, int st
     int j = findbreak(p, start, end);
     for (int k = start; k < (j + 1); k++)
     {
-        char first = p[k].first;
 
-      
         v[k].second += "0";
-
     }
     for (int k = j + 1; k <= end; k++)
     {
-        char first = p[k].first;
+
         v[k].second += "1";
-       
     }
 
     assignsf(v, p, start, j);
@@ -141,7 +137,9 @@ tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree
     return minheap.top();
 }
 void encodesf(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::unordered_map<char, std::string> &bitcode, std::vector<pair<char, float>> &p)
-{ std::ofstream fout;
+{
+
+    std::ofstream fout;
     fout.open(encodefile, std::ios::app);
     std::ifstream fin;
     fin.open(filename);
@@ -458,7 +456,7 @@ void printdecode(tree *root)
         return;
     }
     if (root->ch != INTERNAL_NODE_CHARACTER)
-    { 
+    {
         std::cout << root->ch;
     }
     else
@@ -518,7 +516,7 @@ int main()
                 ch2 = 0;
                 while (ch2 != 3)
                 {
-                    std::cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back"
+                    std::cout << "\t\t 1. Print Huffman Encode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n"
                               << "\n";
                     std::cin >> ch2;
                     switch (ch2)
@@ -542,6 +540,10 @@ int main()
                         charac.clear();
                         counter.clear();
                         break;
+                    case 4:
+                        ch2 = 3;
+                        ch1 = 3;
+                        break;
                     default:
                         std::cout << "Enter valid input\n";
                         break;
@@ -551,14 +553,34 @@ int main()
             else if (choice == 2)
             {
                 encodesf(filename, encodefile, counter, bitcode, p);
-
-                for (auto i : p)
+                std::cout << "\t\t 1. Print Probabilites \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n";
+                ch2 = 0;
+                while (ch2 != 3)
                 {
-                    cout << i.first << ": " << i.second << "\n";
-                }
-                for (auto i : bitcode)
-                {
-                    cout << i.first << ": " << i.second << "\n";
+                    switch (ch2)
+                    {
+                    case 1:
+                        for (auto i : p)
+                        {
+                            cout << i.first << ": " << i.second << "\n";
+                        }
+                        break;
+                    case 2:
+                        for (auto i : bitcode)
+                        {
+                            cout << i.first << ": " << i.second << "\n";
+                        }
+                        break;
+                    case 3:
+                        /* code */
+                        break;
+                    case 4:
+                        ch2 = 3;
+                        ch1 = 3;
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
             break;
@@ -574,7 +596,7 @@ int main()
             ch2 = 0;
             while (ch2 != 3)
             {
-                std::cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back"
+                std::cout << "\t\t 1. Print Huffman Decode Tree \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n"
                           << "\n";
                 std::cin >> ch2;
                 if (ch2 == 1)
@@ -599,6 +621,10 @@ int main()
                 else if (ch2 == 3)
                 {
                     bitcode.clear();
+                }
+                else if(ch2==4){
+                    ch2=3;
+                    ch1=3;
                 }
                 else
                 {
