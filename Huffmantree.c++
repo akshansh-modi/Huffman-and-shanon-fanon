@@ -1,5 +1,5 @@
 #include <iostream>
-using namespace std;
+
 #include <fstream>
 #define INTERNAL_NODE_CHARACTER char(188)
 #define PSEUDO_EOF char(129)
@@ -12,23 +12,31 @@ using namespace std;
 #include <windows.h>
 #include "huffman.h"
 #include <algorithm>
+int filesize(std::string filename)
+{
+    std::fstream in_file("a.txt", std::ios::binary);
+    in_file.seekg(0, std::ios::end);
+    int file_size = in_file.tellg();
+    return file_size;
+}
+
 void entry();
 void freqcount(char text, std::unordered_map<char, int> &counter) // assign frequency of occurance to characters
 {
 
     counter[text]++;
 }
-// int calctotal(std::unordered_map<char, int> &counter)
-// {
-//     int total = 0;
-//     for (auto i : counter)
-//     {
-//         total += i.second;
-//     }
+int calctotal(std::unordered_map<char, int> counter)
+{
 
-//     return total;
-// }
-void prcount(vector<pair<char, float>> &p, std::unordered_map<char, int> counter)
+    int total = 0;
+    for (auto i : counter)
+    {
+        total += i.second;
+    }
+    return total;
+}
+void prcount(std::vector<std::pair<char, float>> &p, std::unordered_map<char, int> counter)
 {
     char first;
     float second;
@@ -41,11 +49,11 @@ void prcount(vector<pair<char, float>> &p, std::unordered_map<char, int> counter
     {
         first = i.first;
         second = ((float)i.second / (float)total);
-        p.push_back(make_pair(first, second));
+        p.push_back(std::make_pair(first, second));
     }
 }
 
-int findbreak(vector<pair<char, float>> A, int start, int end)
+int findbreak(std::vector<std::pair<char, float>> A, int start, int end)
 {
     float sum = 0;
     for (int i = start; i <= end; i++)
@@ -74,11 +82,11 @@ int findbreak(vector<pair<char, float>> A, int start, int end)
 
     return start;
 }
-bool cmp(pair<char, float> &a, pair<char, float> &b)
+bool cmp(std::pair<char, float> &a, std::pair<char, float> &b)
 {
     return a.second > b.second;
 }
-void assignsf(vector<pair<char, string>> &v, vector<pair<char, float>> p, int start, int end)
+void assignsf(std::vector<std::pair<char, std::string>> &v, std::vector<std::pair<char, float>> p, int start, int end)
 {
     int size = end - start + 1;
     char ch;
@@ -136,9 +144,9 @@ tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree
 
     return minheap.top();
 }
-void encodesf(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::unordered_map<char, std::string> &bitcode, std::vector<pair<char, float>> &p)
+void encodesf(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::unordered_map<char, std::string> &bitcode, std::vector<std::pair<char, float>> &p)
 {
-
+int esize=0;
     std::ofstream fout;
     fout.open(encodefile, std::ios::app);
     std::ifstream fin;
@@ -153,10 +161,10 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
     prcount(p, counter);
     sort(p.begin(), p.end(), cmp);
     int sizep = p.size();
-    vector<pair<char, string>> v;
+    std::vector<std::pair<char, std::string>> v;
     for (int i = 0; i < sizep; i++)
     {
-        v.push_back(make_pair(p[i].first, ""));
+        v.push_back(std::make_pair(p[i].first, ""));
     }
     assignsf(v, p, 0, sizep - 1);
     for (auto i : v)
@@ -178,11 +186,11 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
     {
         cr = i.first;
         code = i.second;
-
+esize+=3+code.length();
         fout << cr << CHARACTER_CODE_SEPERATOR << code << HEADER_ENTRY_SEPERATOR;
     }
     fout << HEADER_TEXT_SEPERATOR;
-
+esize++;
     int bufcount = 0;
     char buff = '\0';
 
@@ -199,7 +207,7 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
             }
             bufcount++;
             if (bufcount == 8)
-            {
+            {esize++;
                 fout << buff;
                 bufcount = 0;
                 buff = '\0';
@@ -216,24 +224,25 @@ void encodesf(std::string filename, std::string encodefile, std::unordered_map<c
         }
         bufcount++;
         if (bufcount == 8)
-        {
+        {esize++;
             fout << buff;
             bufcount = 0;
             buff = '\0';
         }
     }
     if (buff != '\0')
-    {
+    {esize++;
         fout << buff;
     }
-
+    int osize = calctotal(counter) - 1;
+    std::cout << "\n\t\toriginal file size : " << osize << " \n\t\tcompressed file size : " << esize << " \n\t\tratio: " << (float)esize / (float)osize << "\n";
     fin.close();
     fout.flush();
     fout.close();
 }
 tree *encode(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::priority_queue<tree *, std::vector<tree *>, comparenode> &minheap, std::unordered_map<char, std::string> &bitcode)
 {
-
+    int esize = 0;
     std::ofstream fout;
     fout.open(encodefile, std::ios::app);
     std::ifstream fin;
@@ -257,10 +266,11 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
     {
         cr = i.first;
         code = i.second;
-
         fout << cr << CHARACTER_CODE_SEPERATOR << code << HEADER_ENTRY_SEPERATOR;
+        esize = 3 + code.length();
     }
     fout << HEADER_TEXT_SEPERATOR;
+    esize++;
 
     int bufcount = 0;
     char buff = '\0';
@@ -279,7 +289,9 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
             bufcount++;
             if (bufcount == 8)
             {
+
                 fout << buff;
+                esize++;
                 bufcount = 0;
                 buff = '\0';
             }
@@ -297,6 +309,7 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
         if (bufcount == 8)
         {
             fout << buff;
+            esize++;
             bufcount = 0;
             buff = '\0';
         }
@@ -304,8 +317,10 @@ tree *encode(std::string filename, std::string encodefile, std::unordered_map<ch
     if (buff != '\0')
     {
         fout << buff;
+        esize++;
     }
-
+    int osize = calctotal(counter) - 1;
+    std::cout << "\n\t\toriginal file size : " << osize << " \n\t\tcompressed file size : " << esize << " \n\t\tratio: " << (float)esize / (float)osize << "\n";
     fin.close();
     fout.flush();
     fout.close();
@@ -481,7 +496,7 @@ int main()
     std::priority_queue<tree *, std::vector<tree *>, comparenode> minheap;
     std::unordered_map<char, std::string> bitcode;
     std::unordered_map<std::string, char> charac;
-    std::vector<pair<char, float>> p;
+    std::vector<std::pair<char, float>> p;
     std::string filename;
     std::string encodefile;
     std::string decodefile;
@@ -503,9 +518,9 @@ int main()
             std::cin >> filename;
             std::cout << "enter encodefile: ";
             std::cin >> encodefile;
-            cout << "1. HUFFMAN \n2. Shanon-Fanon\n";
+            std::cout << "1. Huffman \n2. Shanon-Fanon\n";
             int choice;
-            cin >> choice;
+            std::cin >> choice;
             if (choice == 1)
             {
                 tree *root;
@@ -562,13 +577,13 @@ int main()
                     case 1:
                         for (auto i : p)
                         {
-                            cout << i.first << ": " << i.second << "\n";
+                            std::cout << i.first << ": " << i.second << "\n";
                         }
                         break;
                     case 2:
                         for (auto i : bitcode)
                         {
-                            cout << i.first << ": " << i.second << "\n";
+                            std::cout << i.first << ": " << i.second << "\n";
                         }
                         break;
                     case 3:
@@ -622,9 +637,10 @@ int main()
                 {
                     bitcode.clear();
                 }
-                else if(ch2==4){
-                    ch2=3;
-                    ch1=3;
+                else if (ch2 == 4)
+                {
+                    ch2 = 3;
+                    ch1 = 3;
                 }
                 else
                 {
