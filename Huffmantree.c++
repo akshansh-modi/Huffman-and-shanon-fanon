@@ -141,9 +141,7 @@ tree *buildtree(std::unordered_map<char, int> &counter, std::priority_queue<tree
     return minheap.top();
 }
 void encodesf(std::string filename, std::string encodefile, std::unordered_map<char, int> &counter, std::unordered_map<char, std::string> &bitcode, std::vector<pair<char, float>> &p)
-{
-
-    std::ofstream fout;
+{ std::ofstream fout;
     fout.open(encodefile, std::ios::app);
     std::ifstream fin;
     fin.open(filename);
@@ -460,7 +458,7 @@ void printdecode(tree *root)
         return;
     }
     if (root->ch != INTERNAL_NODE_CHARACTER)
-    {
+    { 
         std::cout << root->ch;
     }
     else
