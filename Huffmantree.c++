@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <fstream>
 #define INTERNAL_NODE_CHARACTER char(188)
 #define PSEUDO_EOF char(129)
@@ -10,11 +9,10 @@
 #include <queue>
 #include <unistd.h>
 #include <windows.h>
-// #include "huffman.h"
 #include <algorithm>
 
+
 void entry();
-#include <iostream>
 
 class tree
 {
@@ -90,7 +88,7 @@ int findbreak(std::vector<std::pair<char, float>> A, int start, int end)
             {
                 return j;
             }
-            float prevs = s - A[j - 1].second;
+            float prevs = s - A[j].second;
             if ((half - prevs) < (s - half))
                 return j - 1;
             return j;
@@ -543,6 +541,7 @@ int main()
             std::cin >> choice;
             if (choice == 1)
             {
+
                 tree *root;
                 root = encode(filename, encodefile, counter, minheap, bitcode);
                 std::cout << "Encoded Successfully !!"
@@ -572,7 +571,7 @@ int main()
                         break;
                     case 3:
                         bitcode.clear();
-                        charac.clear();
+
                         counter.clear();
                         break;
                     case 4:
@@ -589,10 +588,10 @@ int main()
             {
                 encodesf(filename, encodefile, counter, bitcode, p);
                 ch2 = 0;
-                std::cout << "\t\t 1. Print Probabilites \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n";
 
                 while (ch2 != 3)
                 {
+                    std::cout << "\t\t 1. Print Probabilites \n\t\t 2. Print Binary Code \n\t\t 3. Back \n\t\t 4. Exit\n";
                     std::cin >> ch2;
                     switch (ch2)
                     {
@@ -609,7 +608,9 @@ int main()
                         }
                         break;
                     case 3:
-                        /* code */
+                        bitcode.clear();
+                        p.clear();
+                        counter.clear();
                         break;
                     case 4:
                         ch2 = 3;
@@ -643,6 +644,7 @@ int main()
                     tree *root2 = new tree(INTERNAL_NODE_CHARACTER);
 
                     decodetree(root2, bitcode);
+
                     printdecode(root2);
                 }
                 else if (ch2 == 2)
@@ -658,6 +660,7 @@ int main()
                 else if (ch2 == 3)
                 {
                     bitcode.clear();
+                    charac.clear();
                 }
                 else if (ch2 == 4)
                 {
@@ -671,6 +674,7 @@ int main()
             }
 
             break;
+
         case 3:
             break;
         default:
